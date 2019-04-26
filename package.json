@@ -1,0 +1,19 @@
+{
+  "name": "strat_aws",
+  "version": "0.1.0",
+  "description": "",
+  "main": "aws.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stratworld/strat_aws.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stratworld/strat_aws/issues"
+  },
+  "homepage": "https://github.com/stratworld/strat_aws#readme"
+}
