@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "aws.js",
+  "preferGlobal": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,10 +11,16 @@
     "type": "git",
     "url": "git+https://github.com/stratworld/strat_aws.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "CCG",
+  "license": "MIT",
+  "bin": {
+    "staws": "./aws.js"
+  },
   "bugs": {
     "url": "https://github.com/stratworld/strat_aws/issues"
   },
-  "homepage": "https://github.com/stratworld/strat_aws#readme"
+  "homepage": "https://github.com/stratworld/strat_aws#readme",
+  "dependencies": {
+    "aws-sdk": "^2.444.0"
+  }
 }
