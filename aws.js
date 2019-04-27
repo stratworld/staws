@@ -1,4 +1,6 @@
-require('./util/jsExtensions');
+#!/usr/bin/env node
+
+require('./node_modules/stratc/util/jsExtensions');
 const config = require('./src/config');
 const AWS = require('aws-sdk');
 AWS.config.update(config.config);

@@ -1,4 +1,5 @@
-const ArchiveBuilder = require('../util/archiveBuilder');
+//so ghetto
+const ArchiveBuilder = require('../node_modules/stratc/util/archiveBuilder');
 const createRole = require('./createIamRole');
 const createLambda = require('./createLambda');
 
@@ -7,13 +8,13 @@ module.exports = async saBuf => {
     const hosts = await ingest(saBuf);
     hosts.values().forEach(setLambdaName);
     await createRolesForHosts(hosts);
+    //replace substrate fns
     await deployLambdas(hosts);
     await birth(hosts);
   } catch (e) {
     console.log(e.stack)
   }
 
-  //deploy lambda bundles
   //birth
     //http connection
     // I think we're going to want to create a role for api gateway way here
@@ -22,26 +23,38 @@ module.exports = async saBuf => {
 }
 
 async function createRolesForHosts (hosts) {
-  return Promise.all(hosts.values().map(async host => {
+  return await Promise.all(hosts.values().map(async host => {
     const targets = host.inScope
       .keys()
-      .map(target => hosts[target].functionName);
+      .map(target => hosts
+        .values()
+        .filter(candidateTargetHost =>
+          candidateTargetHost.containers[target]
+          && candidateTargetHost.name !== host.name)
+        .map(host => host.functionName)
+        [0])
+      .purge()
+      .constantMapping(true)
+      .keys();
     host.roleArn = await createRole(host, targets);
   }));
 }
 
 async function deployLambdas (hosts) {
-  return Promise.all(hosts.values().map(async host => {
+  return await Promise.all(hosts.values().map(async host => {
     const targets = host.inScope
       .keys()
       .map(target => {
         return {
           service: target,
-          functionName: hosts[target].functionName
+          functionName: hosts
+            .values()
+            .filter(host => host.containers[target])
+            .map(host => host.functionName)
+            [0]
         };
       });
-    //don't need to return or assign anything
-    createLambda(host, targets);
+    return await createLambda(host, targets);
   }));
 }
 

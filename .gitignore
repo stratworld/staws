@@ -2,3 +2,4 @@ node_modules/
 *.sa
 staws.json
 *.zip
+package-lock.json
