@@ -25,10 +25,10 @@ async function create (host) {
         lambda.createFunction(params, function (err, res) {
           if (err) reject(err);
           else {
-            resolve({
+            resolve({ [host.name]: {
               functionName: res.FunctionName,
               functionArn: res.FunctionArn
-            });
+            } });
           }
         });
       });

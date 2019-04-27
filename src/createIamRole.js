@@ -14,7 +14,9 @@ const sdk = {
   getRole: promisify('getRole')
 }
 
-module.exports = async function (host, targetFunctionNames) {
+module.exports = async function (host,
+  targetFunctionNames,
+  assumableBy = 'lambda.amazonaws.com') {
   const account = await getAccountId();
   const targetObjs = targetFunctionNames
     .map(fnName => {
@@ -27,11 +29,11 @@ module.exports = async function (host, targetFunctionNames) {
 
   const roleName = `Strat-${host.name}-${host.id}`;
   console.log(`Creating role ${roleName}`);
-  return createRole('lambda.amazonaws.com', roleName, targetObjs);
+  return createRole(assumableBy, roleName, targetObjs);
 };
 
 async function createRole (assumeService, roleName, targets) {
-  const role = await createRoleIdempotent(roleName);
+  const role = await createRoleIdempotent(roleName, assumeService);
   if (targets.length > 0) {
     const policies = {
       Version: "2012-10-17",
@@ -66,7 +68,7 @@ async function createRole (assumeService, roleName, targets) {
   return role.Role.Arn;
 }
 
-async function createRoleIdempotent (roleName) {
+async function createRoleIdempotent (roleName, assumeService) {
   var createRoleParams = {
     AssumeRolePolicyDocument: JSON.stringify({
       "Version": "2012-10-17",
@@ -74,7 +76,7 @@ async function createRoleIdempotent (roleName) {
         {
           "Effect": "Allow",
           "Principal": {
-            "Service": [ 'lambda.amazonaws.com' ]
+            "Service": [ assumeService ]
           },
           "Action": "sts:AssumeRole"
         }

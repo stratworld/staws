@@ -22,18 +22,25 @@ function createConfig (host, targetFunctions) {
     onHost: host.artifacts
       .toMap(artifact => `./${artifact.saPath}`, artifact => artifact.name),
     ranged: (targetFunctions || [])
-      .toMap(tfn => tfn.functionName, tfn => tfn.service)
+      .toMap(tfn => tfn.functionName, tfn => tfn.service),
+    resources: host.artifacts
+      .filter(artifact => artifact.isResource)
+      .map(artifact => artifact.name)
+      .constantMapping(true)
   };
 }
 
 function getDataFrom (artifact) {
   if (artifact.name.indexOf('.$SUBSTRATE-') > -1) {
     const substrateFn = artifact.name.split('.$SUBSTRATE-')[1];
-    try {
-      return fs.readFileSync(stdPath.resolve(substrateDir, `${substrateFn}.js`));  
-    } catch (e) {
-      throw new Error(`Could not load $SUBSTRATE.${substrateFn}.
-  ${e.stack}`);
+    //this is just used for Brith; we don't have to copy it out there
+    if (substrateFn !== 'httpConnection') {
+      try {
+        return fs.readFileSync(stdPath.resolve(substrateDir, `${substrateFn}.js`));  
+      } catch (e) {
+        throw new Error(`Could not load $SUBSTRATE.${substrateFn}.
+    ${e.stack}`);
+      }
     }
   }
   return artifact.data;

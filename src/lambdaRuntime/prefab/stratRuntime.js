@@ -1,5 +1,6 @@
 //config will be placed inside the lambda
 const config = require('./config.json');
+const cat = require('util').promisify(require('fs').readFile);
 const domoFactory = require(config.onHost['Strat.majordomo']);
 var domo;
 module.exports = {
@@ -18,8 +19,13 @@ module.exports = {
 };
 
 async function invoke (reference, event) {
-  if (config.onHost[reference] !== undefined) {
-    return require(config.onHost[reference])(event);
+  const onHostFile = config.onHost[reference]
+  if (onHostFile !== undefined) {
+    if (config.resources[reference]) {
+      const fileData = await cat(onHostFile);
+      return (fileData || Buffer.from('')).toString();
+    }
+    return require(onHostFile)(event);
   }
   const service = (reference || '').split('.')[0];
   if (service !== undefined) {

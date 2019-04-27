@@ -2,24 +2,18 @@
 const ArchiveBuilder = require('../node_modules/stratc/util/archiveBuilder');
 const createRole = require('./createIamRole');
 const createLambda = require('./createLambda');
+const local = require('../node_modules/stratc/svs/local');
+const stdPath = require('path');
+const config = require('./config');
+const region = config.config.region;
+const substrateImpls = stdPath.resolve(__dirname, 'SubstrateImpl');
 
-module.exports = async saBuf => {
-  try {
-    const hosts = await ingest(saBuf);
-    hosts.values().forEach(setLambdaName);
-    await createRolesForHosts(hosts);
-    //replace substrate fns
-    await deployLambdas(hosts);
-    await birth(hosts);
-  } catch (e) {
-    console.log(e.stack)
-  }
-
-  //birth
-    //http connection
-    // I think we're going to want to create a role for api gateway way here
-
-  //http reception
+module.exports = async (saBuf, fileName) => {
+  const hosts = await ingest(saBuf);
+  hosts.values().forEach(setLambdaName);
+  await createRolesForHosts(hosts);
+  const lambdas = await deployLambdas(hosts);
+  await birth(saBuf, lambdas, fileName);
 }
 
 async function createRolesForHosts (hosts) {
@@ -41,7 +35,7 @@ async function createRolesForHosts (hosts) {
 }
 
 async function deployLambdas (hosts) {
-  return await Promise.all(hosts.values().map(async host => {
+  const lambdaResults = await Promise.all(hosts.values().map(async host => {
     const targets = host.inScope
       .keys()
       .map(target => {
@@ -56,10 +50,17 @@ async function deployLambdas (hosts) {
       });
     return await createLambda(host, targets);
   }));
+  return lambdaResults
+    .reduce((aggregate, nextResult) => Object.assign(aggregate, nextResult),
+      {});
 }
 
-async function birth (hosts) {
-
+async function birth (saBuf, lambdas, fileName) {
+  await local(saBuf, substrateImpls, {
+    region: region,
+    lambdas: lambdas,
+    fileName: fileName
+  });
 }
 
 function setLambdaName (host) {

@@ -25,7 +25,7 @@ var filename = stdPath.resolve(process.cwd(), process.argv[2]);
 
 try {
   cat(filename)
-    .then(deploy)
+    .then(saBuf => deploy(saBuf, filename))
     .catch(asyncError => {
       console.log(asyncError.stack);
       process.exit(1);
