@@ -65,8 +65,11 @@ ArchiveBuilder.prototype.files = function (destinationDirectory) {
 }
 
 ArchiveBuilder.prototype.data = function () {
-  //this.zip.writeZip(stdPath.resolve(process.cwd(), 'out.zip'));
   return this.zip.toBuffer();
+}
+
+ArchiveBuilder.prototype.write = function (path = 'out.zip') {
+  this.zip.writeZip(stdPath.resolve(process.cwd(), path));
 }
 
 module.exports = ArchiveBuilder;

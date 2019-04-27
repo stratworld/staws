@@ -1,4 +1,7 @@
 require('./util/jsExtensions');
+const config = require('./src/config');
+const AWS = require('aws-sdk');
+AWS.config.update(config.config);
 const stdPath = require('path');
 const cat = require('util').promisify(require('fs').readFile);
 const deploy = require('./src/deploy.js');
@@ -29,7 +32,6 @@ try {
   console.log(syncError.stack);
   process.exit(1);
 }
-
 
 function printHelp () {
   console.log(`Usage for staws:
