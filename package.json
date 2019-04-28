@@ -1,5 +1,5 @@
 {
-  "name": "strat_aws",
+  "name": "staws",
   "version": "0.1.0",
   "description": "",
   "main": "aws.js",
