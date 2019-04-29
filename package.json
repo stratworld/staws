@@ -1,6 +1,6 @@
 {
   "name": "staws",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "",
   "main": "aws.js",
   "preferGlobal": true,
