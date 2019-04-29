@@ -8,7 +8,7 @@ module.exports = async ({ region, lambdas, fileName }) => {
   const httpLambda = lambdas['Http'];
   AWS.config.update({region: region});
   await createApi(region, name, httpLambda);
-  return 'API Gateway API \'source\' created successfully';
+  return `API Gateway API '${name}' created successfully`;
 }
 
 function buildSDK (AWS) {
