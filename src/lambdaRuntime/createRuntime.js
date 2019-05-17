@@ -1,4 +1,4 @@
-const ArchiveBuilder = require('../../node_modules/stratc/util/archiveBuilder');
+const ArchiveBuilder = require('stratc').archiveBuilder;
 const stdPath = require('path');
 const hostPrefab = stdPath.resolve(__dirname, 'prefab');
 const substrateDir = stdPath.resolve(__dirname, '../SubstrateImpl');

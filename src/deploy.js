@@ -1,8 +1,7 @@
-//so ghetto
-const ArchiveBuilder = require('../node_modules/stratc/util/archiveBuilder');
+const ArchiveBuilder = require('stratc').archiveBuilder;
 const createRole = require('./createIamRole');
 const createLambda = require('./createLambda');
-const local = require('../node_modules/stratc/svs/local');
+const local = require('stratc').local;
 const stdPath = require('path');
 const config = require('./config');
 const region = config.config.region;
