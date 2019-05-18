@@ -5,14 +5,15 @@ const local = require('stratc').local;
 const stdPath = require('path');
 const config = require('./config');
 const region = config.config.region;
-const substrateImpls = stdPath.resolve(__dirname, 'SubstrateImpl');
+const getSubstrateImpls = require('./getSubstrateImpls');
 
 module.exports = async (saBuf, fileName) => {
   const hosts = await ingest(saBuf);
   hosts.values().forEach(setLambdaName);
   await createRolesForHosts(hosts);
-  const lambdas = await deployLambdas(hosts);
-  await birth(saBuf, lambdas, fileName);
+  const substrateImpls = await getSubstrateImpls();
+  const lambdas = await deployLambdas(hosts, substrateImpls);
+  await birth(saBuf, lambdas, fileName, substrateImpls);
 }
 
 async function createRolesForHosts (hosts) {
@@ -33,7 +34,7 @@ async function createRolesForHosts (hosts) {
   }));
 }
 
-async function deployLambdas (hosts) {
+async function deployLambdas (hosts, substrateImpls) {
   const lambdaResults = await Promise.all(hosts.values().map(async host => {
     const targets = host.inScope
       .keys()
@@ -47,14 +48,14 @@ async function deployLambdas (hosts) {
             [0]
         };
       });
-    return await createLambda(host, targets);
+    return await createLambda(host, targets, substrateImpls);
   }));
   return lambdaResults
     .reduce((aggregate, nextResult) => Object.assign(aggregate, nextResult),
       {});
 }
 
-async function birth (saBuf, lambdas, fileName) {
+async function birth (saBuf, lambdas, fileName, substrateImpls) {
   await local(saBuf, substrateImpls, {
     region: region,
     lambdas: lambdas,

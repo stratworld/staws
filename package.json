@@ -1,6 +1,6 @@
 {
   "name": "staws",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "",
   "main": "index.js",
   "preferGlobal": true,
@@ -22,7 +22,7 @@
   "homepage": "https://github.com/stratworld/strat_aws#readme",
   "dependencies": {
     "aws-sdk": "^2.444.0",
-    "stratc": "^0.3.10"
+    "stratc": "^0.3.12"
   },
   "devDependencies": {
     "webpack": "^4.30.0"

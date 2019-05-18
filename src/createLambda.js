@@ -3,8 +3,8 @@ const lambda = new AWS.Lambda();
 const defaults = require('./lambdaDefaults');
 const createRuntime = require('./lambdaRuntime/createRuntime');
 
-module.exports = async (host, targetFunctions) => {
-  host.runtime = await createRuntime(host, targetFunctions);
+module.exports = async (host, targetFunctions, substrateImpls) => {
+  host.runtime = await createRuntime(host, targetFunctions, substrateImpls);
   return create(host);
 };
 

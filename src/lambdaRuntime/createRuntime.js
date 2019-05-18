@@ -4,15 +4,14 @@ const hostPrefab = stdPath.resolve(__dirname, 'prefab');
 const substrateDir = stdPath.resolve(__dirname, '../SubstrateImpl');
 const fs = require('fs');
 
-module.exports = async (host, targetFunctions) => {
+module.exports = async (host, targetFunctions, substrateImpls) => {
   const runtimeConfig = createConfig(host, targetFunctions);
   const bundle = new ArchiveBuilder();
-  // await bundle.copyDirectory(hostPrefab);
   bundle.addDataAsFile(Buffer.from(getStratHijack()), 'node_modules/strat/index.js');
   bundle.addDataAsFile(Buffer.from(getRuntimeText()), 'stratRuntime.js');
   bundle.addDataAsFile(Buffer.from(JSON.stringify(runtimeConfig)), 'config.json');
   host.artifacts.forEach(artifact => {
-    const data = getDataFrom(artifact);
+    const data = getDataFrom(artifact, substrateImpls);
     bundle.addDataAsFile(data, artifact.saPath);
   });
   return bundle.data();
@@ -32,18 +31,14 @@ function createConfig (host, targetFunctions) {
   };
 }
 
-function getDataFrom (artifact) {
+function getDataFrom (artifact, substrateImpls) {
   if (artifact.name.indexOf('.$SUBSTRATE-') > -1) {
     const substrateFn = artifact.name.split('.$SUBSTRATE-')[1];
-    //this is just used for Brith; we don't have to copy it out there
-    if (substrateFn !== 'httpConnection') {
-      try {
-        return fs.readFileSync(stdPath.resolve(substrateDir, `${substrateFn}.js`));  
-      } catch (e) {
-        throw new Error(`Could not load $SUBSTRATE.${substrateFn}.
-    ${e.stack}`);
-      }
+    const substrateFnObj = substrateImpls.get(substrateFn);
+    if (substrateFnObj === undefined) {
+      throw new Error(`Could not load $SUBSTRATE.${substrateFn}.`);
     }
+    return substrateFnObj.data;
   }
   return artifact.data;
 }
